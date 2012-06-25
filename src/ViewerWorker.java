@@ -15,6 +15,8 @@ import com.google.gson.Gson;
 
 public class ViewerWorker implements Runnable {
 
+	static final int bufferSize = 1;
+	
 	String url, port;
 	JDesktopPane desktop;
 	SourceViewerFrame viewer;
@@ -67,8 +69,8 @@ public class ViewerWorker implements Runnable {
 					IOUtils.readFully(in, buffer);
 
 					int counter = 0;
-					long arrX[] = new long[10];
-					double arrY[] = new double[10];
+					long arrX[] = new long[1];
+					double arrY[] = new double[1];
 					for (int i = 0; i < sect.length / 2; i += 10) {
 
 						long time = (long) (tick * i + sect.startTime);
@@ -89,7 +91,7 @@ public class ViewerWorker implements Runnable {
 						final long[] tempArrX = arrX.clone();
 						final double[] tempArrY = arrY.clone();
 						counter++;
-						if (counter == 10) {
+						if (counter == 1) {
 							SwingUtilities.invokeLater(new Runnable() {
 
 								@Override
@@ -109,7 +111,7 @@ public class ViewerWorker implements Runnable {
 
 				System.out.println("I have read all the fun");
 				
-				Thread.sleep(200);
+				Thread.sleep(2000);
 
 			}
 

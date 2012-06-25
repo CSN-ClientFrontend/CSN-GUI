@@ -1,8 +1,15 @@
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
+import javax.swing.AbstractAction;
 import javax.swing.JInternalFrame;
+import javax.swing.Timer;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -20,6 +27,20 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 public class SourceViewerFrame extends JInternalFrame {
 
+	
+	
+	
+	
+	class Point
+	{
+		long time;
+
+		long[] arrX;
+		double[] arrY;
+	}
+	
+	Queue<Point> buffer = new LinkedList<>();
+	
 	/**
 	 * Launch the application.
 	 */
@@ -67,15 +88,43 @@ public class SourceViewerFrame extends JInternalFrame {
 		
 		add(panel);
 
+		new Timer(1,new ActionListener() {
+					
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				//System.out.println("update");
+				long timeNeeded = System.currentTimeMillis() - 5000;
+				while (true)
+				{
+					
+					Point p = buffer.peek();
+					
+					if (p != null && p.time < timeNeeded)
+					{
+						buffer.poll();
+						for (int i = 0 ;i < p.arrX.length;i++)
+						{
+							series.add(p.arrX[i],p.arrY[i]);
+						}
+					}
+					else
+					{
+						break;
+					}
+				}
+				
+			}
+		}).start();
+		
 	}
 	
 	public void addPoints(long[] arrX, double[] arrY)
 	{
-		for (int i = 0 ;i < arrX.length;i++)
-		{
-			series.add(arrX[i],arrY[i]);
-		}
-		
+		Point p = new Point();
+		p.time = arrX[0];
+		p.arrX = arrX;
+		p.arrY = arrY;
+		buffer.add(p);
 	
 	}
 
