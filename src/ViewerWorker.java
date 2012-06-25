@@ -15,120 +15,74 @@ import com.google.gson.Gson;
 
 public class ViewerWorker implements Runnable {
 
-	static final int bufferSize = 1;
-	
-	String url, port;
-	JDesktopPane desktop;
-	SourceViewerFrame viewer;
+    static final int bufferSize = 1;
 
-	public ViewerWorker(String url, String port, JDesktopPane desktop) {
-		this.url = url;
-		this.port = port;
+    String url, port;
+    JDesktopPane desktop;
+    SourceViewerFrame viewer;
 
-		this.desktop = desktop;
-		viewer = new SourceViewerFrame();
-		desktop.add(viewer);
-		viewer.setVisible(true);
+    public ViewerWorker(String url, String port, JDesktopPane desktop) {
+        this.url = url;
+        this.port = port;
 
-	}
+        this.desktop = desktop;
+        viewer = new SourceViewerFrame();
+        desktop.add(viewer);
+        viewer.setVisible(true);
 
-	@Override
-	public void run() {
+    }
 
-		long lastTime = System.currentTimeMillis() -3000;
-		try (Socket b = new Socket(url, Integer.parseInt(port));
-				DataOutputStream out = new DataOutputStream(b.getOutputStream());
-				DataInputStream in = new DataInputStream(b.getInputStream())) {
+    long lastTime = System.currentTimeMillis() - 3000;
 
-			Gson g = new Gson();
+    @Override
+    public void run() {
 
-			System.out.println("connected");
+        try (Network b = new Network(new Socket(url, Integer.parseInt(port)))) {
 
-			while (true) {
-				final Protocol.Message mes = new Protocol.Message();
-				
-				mes.startTime = lastTime;		
-				mes.endTime = System.currentTimeMillis();
-				
-				
-				
-				out.writeUTF(g.toJson(mes));
+            System.out.println("connected");
 
-				String s = in.readUTF();
-				System.out.println(s);
+            while (true) {
+                b.requestBufferedDataPoints(lastTime, System.currentTimeMillis(), 1, new BufferedDataPointListener() {
+                    
+                    @Override
+                    public void onRecieve(final long[] times, final double[] values) {
+                        SwingUtilities.invokeLater(new Runnable() {
 
-				Protocol.Response res = g.fromJson(s, Protocol.Response.class);
+                            @Override
+                            public void run() {
+                                viewer.addPoints(times , values);
 
-				for (Protocol.Section sect : res.sections) {
-					System.out.println(sect.length);
+                            }
+                        });
+                        
+                    }
+                });
+              
+             
 
-					double tick = 2 * (sect.endTime - sect.startTime)
-							/ ((double) sect.length);
+                System.out.println("I have read all the fun");
 
-					byte[] buffer = new byte[(int) sect.length];
-					IOUtils.readFully(in, buffer);
+                Thread.sleep(2000);
 
-					int counter = 0;
-					long arrX[] = new long[1];
-					double arrY[] = new double[1];
-					for (int i = 0; i < sect.length / 2; i += 10) {
+            }
 
-						long time = (long) (tick * i + sect.startTime);
-						int a = (int) (buffer[i * 2] & 0xFF);
-						int c = (int) (buffer[i * 2 + 1] & 0xff);
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-						int temp = (a << 8) + c;
-						double denom = 1 << 16;
-						double value = temp / denom;
-						value -= .5;
-						value *= 5;
-
-						// System.out.println(a + " : " + c + " : " + temp +
-						// " : "+ denom + " : " + value);
-						arrX[counter] = time;
-						arrY[counter] = value;
-
-						final long[] tempArrX = arrX.clone();
-						final double[] tempArrY = arrY.clone();
-						counter++;
-						if (counter == 1) {
-							SwingUtilities.invokeLater(new Runnable() {
-
-								@Override
-								public void run() {
-									viewer.addPoints(tempArrX, tempArrY);
-
-								}
-							});
-							counter = 0;
-						}
-
-					}
-					
-					lastTime = sect.endTime+1;
-
-				}
-
-				System.out.println("I have read all the fun");
-				
-				Thread.sleep(2000);
-
-			}
-
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+    }
 
 }
