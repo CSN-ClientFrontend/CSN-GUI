@@ -27,6 +27,12 @@ interface BufferedDataPointListener
 }
 
 
+interface ArrayDataPointListener
+{
+    public void onRecieve(long[] times, double[] values);
+}
+
+
 public class Network implements AutoCloseable{
 
     Socket mySock;
@@ -77,7 +83,7 @@ public class Network implements AutoCloseable{
                 double tick =  (endTime - startTime) / ((double) buffer.length/2);
                 
                 
-                for (int i = 0; i < buffer.length / 2; i += 10) {
+                for (int i = 0; i < buffer.length / 2; i ++) {
 
                     long time = (long) (tick * i + startTime);
 
@@ -92,6 +98,38 @@ public class Network implements AutoCloseable{
         });
     }
     
+    
+    public void requestArrayDataPoints(long startTime, long endTime, final ArrayDataPointListener list) throws IOException
+    {
+        requestSegment(startTime, endTime, new SegmentListener() {
+            
+            @Override
+            public void onReceive(long startTime, long endTime, byte[] buffer) {
+                int numOfValues = buffer.length/2;
+                
+                long[] times = new long[numOfValues];
+                double[] values = new double[numOfValues];
+                
+                double tick =  (endTime - startTime) / ((double) buffer.length/2);
+                
+                
+                for (int i = 0; i < numOfValues; i ++) {
+
+                    long time = (long) (tick * i + startTime);
+
+                    double value = Network.getValue(buffer[i * 2], buffer[i * 2 + 1]);
+                
+                    times[i] = time;
+                    values[i] = value;
+                   
+                }
+                
+                list.onRecieve(times, values);
+                
+            }
+        });
+        
+    }
     
     
     private int counter;

@@ -23,6 +23,7 @@ import java.awt.SystemColor;
 import javax.swing.JInternalFrame;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JCheckBoxMenuItem;
 
 
 public class MainWindow {
@@ -54,10 +55,14 @@ public class MainWindow {
 		initialize();
 	}
 
+	
+	StreamViewer streamViewer;
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+	    
 		frmCommunitySeismicNetwork = new JFrame();
 		frmCommunitySeismicNetwork.setTitle("Community Seismic Network- Viewer");
 		frmCommunitySeismicNetwork.setBounds(100, 100, 734, 395);
@@ -67,6 +72,10 @@ public class MainWindow {
 		final JDesktopPane desktopPane = new JDesktopPane();
 		desktopPane.setBackground(SystemColor.menu);
 		frmCommunitySeismicNetwork.getContentPane().add(desktopPane);
+		
+		
+		streamViewer =  new StreamViewer();
+		desktopPane.add(streamViewer);
 		
 //		SourceViewerFrame f = new SourceViewerFrame();
 //		desktopPane.add(f);
@@ -78,16 +87,20 @@ public class MainWindow {
 		JMenu mnFile = new JMenu("File");
 		menuBar.add(mnFile);
 		
-		JMenuItem mntmAddSource = new JMenuItem("Add Source");
-		mntmAddSource.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				AddSourceDialog newSource = new AddSourceDialog(desktopPane);
-				newSource.setVisible(true);
-			}
-		});
-		mnFile.add(mntmAddSource);
-		
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mnFile.add(mntmExit);
+		
+		JMenu mnView = new JMenu("View");
+		menuBar.add(mnView);
+		
+		final JCheckBoxMenuItem chckbxmntmStreamViewer = new JCheckBoxMenuItem("Stream Viewer");
+		chckbxmntmStreamViewer.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent arg0) {
+		        System.out.println("Foo");
+		        streamViewer.setVisible(chckbxmntmStreamViewer.getState());
+		            
+		    }
+		});
+		mnView.add(chckbxmntmStreamViewer);
 	}
 }
