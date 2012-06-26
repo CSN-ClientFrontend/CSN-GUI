@@ -78,7 +78,7 @@ public class StreamViewer extends JInternalFrame {
         @Override
         public void removeSource(Source b) {
             XYSeries series = sourcesToSeries.get(b.getName());
-            series.setMaximumItemCount(20000*4);
+            
             coll.removeSeries(series);
             sourcesToSeries.remove(b.getName());
             
@@ -87,6 +87,7 @@ public class StreamViewer extends JInternalFrame {
         @Override
         public void addSource(Source a) {
             XYSeries series = new XYSeries(a.getName());
+            series.setMaximumItemCount(20000*4);
             coll.addSeries(series);
             sourcesToSeries.put(a.getName(), series);
             
