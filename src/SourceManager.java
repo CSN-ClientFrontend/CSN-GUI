@@ -28,24 +28,46 @@ public class SourceManager implements StatusListener {
     }
     
     private List<SourceManagerChangesListener> changes = new ArrayList<>();
-    private List<Source> sources = new ArrayList<>();
+   List<Source> sources = new ArrayList<>();
     private List<AbstractTableModel> listeners = new ArrayList<>();
     
-    public void requestData(long startTime, long endTime, final SourceManagerListener list)
+    public void requestData(long[] startTimes, long[] endTimes, final SourceManagerListener list)
     {
-        for (final Source source : sources)
+        
+        for (int i = 0;i < sources.size(); i++)
         {
-            final Source temp = source;
+            final Source source = sources.get(i);
+            long startTime = startTimes[i];
+            long endTime = endTimes[i];
             source.requestData(startTime, endTime, new SourceListener() {
                 
                 @Override
                 public void onRecieve(long[] times, double[] values) {
-                    list.onRecieve(times, values, temp);
+                    list.onRecieve(times, values, source);
                     
                 }
             });
         }
     }
+    
+    
+    public void requestData(long startTime, long endTime, final SourceManagerListener list)
+    {
+        for (int i = 0;i < sources.size(); i++)
+        {
+            final Source source = sources.get(i);
+           
+            source.requestData(startTime, endTime, new SourceListener() {
+                
+                @Override
+                public void onRecieve(long[] times, double[] values) {
+                    list.onRecieve(times, values, source);
+                    
+                }
+            });
+        }
+    }
+    
     
     public void addSource(Source s)
     {

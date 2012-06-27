@@ -68,8 +68,12 @@ public class StreamViewer extends JInternalFrame {
     NumberAxis range = new NumberAxis();
     DateAxis domain = new DateAxis();
     Map<String, XYSeries> sourcesToSeries = new HashMap<>();
+    Map<String,Long> sourceToLastData = new HashMap<>();
     
-    long lastTime = System.currentTimeMillis();
+    
+    boolean started = false;
+    
+    long lastTime = 0;
     
     public StreamViewer() {
        
@@ -86,10 +90,15 @@ public class StreamViewer extends JInternalFrame {
         
         @Override
         public void addSource(Source a) {
+       
+            started = true;
             XYSeries series = new XYSeries(a.getName());
             series.setMaximumItemCount(20000*4);
             coll.addSeries(series);
             sourcesToSeries.put(a.getName(), series);
+            
+            
+            sourceToLastData.put(a.getName(), (long) 0);
             
         }
     });
@@ -126,7 +135,23 @@ public class StreamViewer extends JInternalFrame {
             
             @Override
             public void actionPerformed(ActionEvent arg0) {
-               sources.requestData(lastTime, -1, new SourceManagerListener() {
+                
+                long[] startTimes = new long[sources.sources.size()];
+                long[] endTimes = new long[sources.sources.size()];
+                for (int i = 0; i< sources.sources.size(); i++)
+                {
+                   Source c = sources.sources.get(i);
+                    long lastTime = sourceToLastData.get(c.getName());
+                    if (lastTime < System.currentTimeMillis() - 16000)
+                        lastTime = System.currentTimeMillis() - 16000;
+                    
+                    startTimes[i] = lastTime;
+                    endTimes[i] = -1;
+                    
+                }
+                
+                
+               sources.requestData(startTimes, endTimes, new SourceManagerListener() {
                 
                 @Override
                 public void onRecieve(long[] times, double[] values, Source source) {
@@ -134,7 +159,7 @@ public class StreamViewer extends JInternalFrame {
                    
                    XYSeries series = sourcesToSeries.get(name);                 
                    
-                   for (int i = 0; i  < times.length; i++)
+                   for (int i = 0; i  < times.length; i+=10)
                    {
                        Point p = new Point();
                        p.time = times[i];
@@ -144,7 +169,8 @@ public class StreamViewer extends JInternalFrame {
                        buffer.add(p);
                    }
                    
-                   lastTime = times[times.length -1];
+                   
+                   sourceToLastData.put(source.getName(), times[times.length -1]);
                    
                 }
                 
@@ -158,7 +184,7 @@ public class StreamViewer extends JInternalFrame {
             
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                long timeNeeded = System.currentTimeMillis() - 5000;
+                long timeNeeded = System.currentTimeMillis() - 16000;
                 while (true)
                 {
                     
