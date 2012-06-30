@@ -6,5 +6,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Apache IO"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gson"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jfreechart"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jcalandar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/date4j"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

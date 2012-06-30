@@ -31,7 +31,7 @@ public class SourceManager implements StatusListener {
    List<Source> sources = new ArrayList<>();
     private List<AbstractTableModel> listeners = new ArrayList<>();
     
-    public void requestData(long[] startTimes, long[] endTimes, final SourceManagerListener list)
+    public void requestData(long[] startTimes, long[] endTimes, int resolution, final SourceManagerListener list)
     {
         
         for (int i = 0;i < sources.size(); i++)
@@ -39,7 +39,7 @@ public class SourceManager implements StatusListener {
             final Source source = sources.get(i);
             long startTime = startTimes[i];
             long endTime = endTimes[i];
-            source.requestData(startTime, endTime, new SourceListener() {
+            source.requestData(startTime, endTime, resolution, new SourceListener() {
                 
                 @Override
                 public void onRecieve(long[] times, double[] values) {
@@ -51,13 +51,13 @@ public class SourceManager implements StatusListener {
     }
     
     
-    public void requestData(long startTime, long endTime, final SourceManagerListener list)
+    public void requestData(long startTime, long endTime,int resolution, final SourceManagerListener list)
     {
         for (int i = 0;i < sources.size(); i++)
         {
             final Source source = sources.get(i);
            
-            source.requestData(startTime, endTime, new SourceListener() {
+            source.requestData(startTime, endTime, resolution, new SourceListener() {
                 
                 @Override
                 public void onRecieve(long[] times, double[] values) {
@@ -69,7 +69,7 @@ public class SourceManager implements StatusListener {
     }
     
     
-    public void addSource(Source s)
+    public void addSourceToPlot(Source s)
     {
         sources.add(s);
         s.addStatusListener(this);

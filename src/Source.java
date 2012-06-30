@@ -45,13 +45,14 @@ public class Source implements AutoCloseable, StatusListener {
         this.port = port;
     }
     
-    public void requestData(long startTime, long endTime, SourceListener list)
+    public void requestData(long startTime, long endTime, int resolution, SourceListener list)
     {
         if (!closed)
         {
         Request res = new Request();
         res.startTime = startTime;
         res.endTime = endTime;
+        res.resolution = resolution;
         res.list = list;
         
         requestList.add(res);
@@ -120,6 +121,7 @@ class Request
 {
     long startTime;
     long endTime;
+    int resolution;
     SourceListener list;
 }
 
@@ -179,7 +181,8 @@ class SourceThread implements Runnable
                     next.endTime = System.currentTimeMillis();
                     
                 updateStatus("Asking for data");
-                network.requestArrayDataPoints(next.startTime, next.endTime, new ArrayDataPointListener() {
+                System.out.println("Asking for data");
+                network.requestArrayDataPoints(next.startTime, next.endTime, next.resolution, new ArrayDataPointListener() {
                     
                     @Override
                     public void onRecieve(final long[] times, final double[] values) {

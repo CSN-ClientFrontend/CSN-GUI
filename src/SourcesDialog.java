@@ -2,6 +2,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -18,7 +19,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 
-public class SourcesDialog extends JDialog {
+public class SourcesDialog extends JFrame {
     private JTable table;
 
     /**
@@ -109,7 +110,7 @@ public class SourcesDialog extends JDialog {
         addSourceButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 
-                m.addSource(new Source(nameField.getText(),urlField.getText(),Integer.parseInt(portField.getText())));
+                m.addSourceToPlot(new Source(nameField.getText(),urlField.getText(),Integer.parseInt(portField.getText())));
             }
         });
         

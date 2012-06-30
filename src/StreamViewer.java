@@ -17,6 +17,8 @@ import org.jfree.chart.renderer.xy.SamplingXYLineRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+
+
 import net.miginfocom.swing.MigLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -31,6 +33,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 
 import javax.swing.Timer;
+import javax.swing.JFrame;
 
 public class StreamViewer extends JInternalFrame {
 
@@ -38,14 +41,20 @@ public class StreamViewer extends JInternalFrame {
      * Launch the application.
      */
     
-    class Point
+    Map<String,Long> sourceToLastData = new HashMap<>();
+  
+    static class Point
     {
         long time;
         double value;
         XYSeries seriesToAddTo;
     }
+
+    
     
     Queue<Point> buffer = new LinkedList<>();
+    
+    
     
     StreamViewerOptions options = new StreamViewerOptions();
     
@@ -65,42 +74,31 @@ public class StreamViewer extends JInternalFrame {
     
     SourceManager sources = new SourceManager();
     
-    XYSeriesCollection coll;
+   
+   
     
-    NumberAxis range = new NumberAxis();
-    DateAxis domain = new DateAxis();
-    Map<String, XYSeries> sourcesToSeries = new HashMap<>();
-    Map<String,Long> sourceToLastData = new HashMap<>();
+    CSNPlot plot = new CSNPlot(sources);
     
+  
     
-    boolean started = false;
-    
-    long lastTime = 0;
     
     public StreamViewer() {
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
        
        sources.addChangeListener(new SourceManagerChangesListener() {
         
         @Override
         public void removeSource(Source b) {
-            XYSeries series = sourcesToSeries.get(b.getName());
-            
-            coll.removeSeries(series);
-            sourcesToSeries.remove(b.getName());
+        
             
         }
         
         @Override
         public void addSource(Source a) {
        
-            started = true;
-            XYSeries series = new XYSeries(a.getName());
-            series.setMaximumItemCount(20000*4);
-            coll.addSeries(series);
-            sourcesToSeries.put(a.getName(), series);
-            
-            
-            sourceToLastData.put(a.getName(), (long) 0);
+        
+           sourceToLastData.put(a.getName(), (long) 0);
+          
             
         }
     });
@@ -110,18 +108,13 @@ public class StreamViewer extends JInternalFrame {
         setBounds(100, 100, 437, 347);
         getContentPane().setLayout(new MigLayout(""));
         
-        domain.setFixedAutoRange(10000);
-        range.setAutoRangeIncludesZero(true);
-        
-        coll = new XYSeriesCollection();
-        XYPlot p = new XYPlot(coll,domain ,range ,new SamplingXYLineRenderer());
-        
-        p.addRangeMarker(new ValueMarker(0,Color.RED,new BasicStroke(5)));
        
-        JFreeChart chart = new JFreeChart(p);
-        ChartPanel panel = new ChartPanel(chart);
+        plot.setFixedSize();
+    
+       
+       
         
-        getContentPane().add(panel, "wrap, span 2");
+        getContentPane().add(plot.getPanel(), "wrap, span 2");
         getContentPane().add(new JSeparator(), "growx, span 2,wrap");
         
         
@@ -163,15 +156,14 @@ public class StreamViewer extends JInternalFrame {
                 }
                 
                 
-               sources.requestData(startTimes, endTimes, new SourceManagerListener() {
+               sources.requestData(startTimes, endTimes,options.getResolution(), new SourceManagerListener() {
                 
                 @Override
                 public void onRecieve(long[] times, double[] values, Source source) {
-                   String name = source.getName();
                    
-                   XYSeries series = sourcesToSeries.get(name);                 
+                   XYSeries series = plot.getSeries(source);                
                    
-                   for (int i = 0; i  < times.length; i+=options.getResolution())
+                   for (int i = 0; i  < times.length; i++)
                    {
                        Point p = new Point();
                        p.time = times[i];

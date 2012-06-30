@@ -1,3 +1,4 @@
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.Menu;
@@ -23,7 +24,13 @@ import java.awt.SystemColor;
 import javax.swing.JInternalFrame;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Date;
+
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
+
+import com.toedter.calendar.JDateChooser;
 
 
 public class MainWindow {
@@ -57,6 +64,7 @@ public class MainWindow {
 
 	
 	StreamViewer streamViewer;
+    HistoryViewer historyViewer;
 	
 	/**
 	 * Initialize the contents of the frame.
@@ -72,6 +80,11 @@ public class MainWindow {
 		final JDesktopPane desktopPane = new JDesktopPane();
 		desktopPane.setBackground(SystemColor.menu);
 		frmCommunitySeismicNetwork.getContentPane().add(desktopPane);
+		
+		
+	
+		historyViewer = new HistoryViewer();
+		desktopPane.add(historyViewer);
 		
 		
 		streamViewer =  new StreamViewer();
@@ -96,11 +109,110 @@ public class MainWindow {
 		final JCheckBoxMenuItem chckbxmntmStreamViewer = new JCheckBoxMenuItem("Stream Viewer");
 		chckbxmntmStreamViewer.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent arg0) {
-		        System.out.println("Foo");
+		       
 		        streamViewer.setVisible(chckbxmntmStreamViewer.getState());
 		            
 		    }
 		});
 		mnView.add(chckbxmntmStreamViewer);
+		
+		streamViewer.addInternalFrameListener(new InternalFrameListener() {
+            
+            @Override
+            public void internalFrameOpened(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void internalFrameIconified(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void internalFrameDeiconified(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void internalFrameDeactivated(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void internalFrameClosing(InternalFrameEvent e) {
+                chckbxmntmStreamViewer.setState(false);
+                
+            }
+            
+            @Override
+            public void internalFrameClosed(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void internalFrameActivated(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+        });
+		
+		
+		final JCheckBoxMenuItem chckbxmntmHistoryViewer = new JCheckBoxMenuItem("History Viewer");
+		chckbxmntmHistoryViewer.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        historyViewer.setVisible(chckbxmntmHistoryViewer.getState());
+		    }
+		});
+		mnView.add(chckbxmntmHistoryViewer);
+		
+		historyViewer.addInternalFrameListener(new InternalFrameListener() {
+            
+            @Override
+            public void internalFrameOpened(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void internalFrameIconified(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void internalFrameDeiconified(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void internalFrameDeactivated(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void internalFrameClosing(InternalFrameEvent e) {
+                chckbxmntmHistoryViewer.setState(false);
+                
+            }
+            
+            @Override
+            public void internalFrameClosed(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+            @Override
+            public void internalFrameActivated(InternalFrameEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+        });
 	}
 }
