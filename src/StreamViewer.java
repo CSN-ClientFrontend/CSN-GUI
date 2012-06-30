@@ -47,6 +47,8 @@ public class StreamViewer extends JInternalFrame {
     
     Queue<Point> buffer = new LinkedList<>();
     
+    StreamViewerOptions options = new StreamViewerOptions();
+    
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -119,8 +121,9 @@ public class StreamViewer extends JInternalFrame {
         JFreeChart chart = new JFreeChart(p);
         ChartPanel panel = new ChartPanel(chart);
         
-        getContentPane().add(panel, "wrap");
-        getContentPane().add(new JSeparator(), "growx, wrap");
+        getContentPane().add(panel, "wrap, span 2");
+        getContentPane().add(new JSeparator(), "growx, span 2,wrap");
+        
         
         
         JButton button = new JButton("Sources");
@@ -130,6 +133,15 @@ public class StreamViewer extends JInternalFrame {
             }
         });
         getContentPane().add(button);
+       
+        
+        JButton optionsButton = new JButton("Options");
+        optionsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                new StreamViewerOptionsDialog(options).setVisible(true);
+            }
+        });
+        getContentPane().add(optionsButton, "align right");
         
         new Timer(2000,new ActionListener() {
             
@@ -142,8 +154,8 @@ public class StreamViewer extends JInternalFrame {
                 {
                    Source c = sources.sources.get(i);
                     long lastTime = sourceToLastData.get(c.getName());
-                    if (lastTime < System.currentTimeMillis() - 16000)
-                        lastTime = System.currentTimeMillis() - 16000;
+                    if (lastTime < System.currentTimeMillis() - options.getDelay()*1000)
+                        lastTime = System.currentTimeMillis() - options.getDelay()*1000;
                     
                     startTimes[i] = lastTime;
                     endTimes[i] = -1;
@@ -159,7 +171,7 @@ public class StreamViewer extends JInternalFrame {
                    
                    XYSeries series = sourcesToSeries.get(name);                 
                    
-                   for (int i = 0; i  < times.length; i+=10)
+                   for (int i = 0; i  < times.length; i+=options.getResolution())
                    {
                        Point p = new Point();
                        p.time = times[i];
@@ -184,7 +196,7 @@ public class StreamViewer extends JInternalFrame {
             
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                long timeNeeded = System.currentTimeMillis() - 16000;
+                long timeNeeded = System.currentTimeMillis() - options.getDelay()*1000;
                 while (true)
                 {
                     

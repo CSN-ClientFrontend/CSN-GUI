@@ -55,6 +55,7 @@ public class SourcesDialog extends JDialog {
     
     
     public SourcesDialog(SourceManager sources) {
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setTitle("Sources");
         m = sources;
         
