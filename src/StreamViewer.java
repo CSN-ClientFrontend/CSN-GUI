@@ -43,18 +43,7 @@ public class StreamViewer extends JInternalFrame {
     
     Map<String,Long> sourceToLastData = new HashMap<>();
   
-    static class Point
-    {
-        long time;
-        double value;
-        XYSeries seriesToAddTo;
-    }
-
-    
-    
-    Queue<Point> buffer = new LinkedList<>();
-    
-    
+     
     
     StreamViewerOptions options = new StreamViewerOptions();
     
@@ -165,12 +154,7 @@ public class StreamViewer extends JInternalFrame {
                    
                    for (int i = 0; i  < times.length; i++)
                    {
-                       Point p = new Point();
-                       p.time = times[i];
-                       p.value = values[i];
-                       p.seriesToAddTo = series;
-                       
-                       buffer.add(p);
+                       series.add(times[i], values[i]);
                    }
                    
                    
@@ -184,30 +168,12 @@ public class StreamViewer extends JInternalFrame {
             }
         }).start();
         
-        new Timer(1,new ActionListener() {
+        new Timer(1000/30,new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                long timeNeeded = System.currentTimeMillis() - options.getDelay()*1000;
-                while (true)
-                {
-                    
-                    
-                    Point p = buffer.peek();
-                    
-                    if (p != null && p.time < timeNeeded)
-                    {
-                        buffer.poll();
-                        
-                        p.seriesToAddTo.add(p.time,p.value);
-                        
-                        
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
+                
+                plot.setRange(System.currentTimeMillis() - options.getDelay()*1000);
                 
             }
         }).start();

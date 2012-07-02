@@ -84,8 +84,16 @@ public class CSNPlot {
     boolean isInFixed = false;
 
     public void setFixedSize() {
+        
         isInFixed = true;
-        domain.setFixedAutoRange(10000);
+       // domain.setFixedAutoRange(10000);
+        
+        domain.setAutoRange(false);
+    }
+    
+    public void setRange(long endTime)
+    {
+        domain.setRange(endTime - 10000, endTime);
     }
 
     public XYSeries getSeries(Source a) {
