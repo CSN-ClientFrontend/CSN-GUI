@@ -122,7 +122,8 @@ public class SourceManager implements StatusListener {
         
         AbstractTableModel model =  new AbstractTableModel() {
             
-            String columnNames[] = {"Name","Location","Status"};
+            String columnNames[] = {"Name","Location","Serial","Status"};
+       
             
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
@@ -138,8 +139,11 @@ public class SourceManager implements StatusListener {
                 
                 case 1:
                     return String.format("%s:%s", s.getUrl(),s.getPort());
-                   
+                    
                 case 2:
+                    return s.getSerial();
+                   
+                case 3:
                     return s.getStatus();
                 }
                 
@@ -156,7 +160,7 @@ public class SourceManager implements StatusListener {
             @Override
             public int getColumnCount() {
                 // TODO Auto-generated method stub
-                return 3;
+                return columnNames.length;
             }
             
             @Override

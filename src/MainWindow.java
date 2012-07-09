@@ -86,6 +86,9 @@ public class MainWindow {
 		historyViewer = new HistoryViewer();
 		desktopPane.add(historyViewer);
 		
+		//RssViewer viewer = new RssViewer();
+		//viewer.setVisible(true);
+		//desktopPane.add(viewer);
 		
 		streamViewer =  new StreamViewer();
 		desktopPane.add(streamViewer);

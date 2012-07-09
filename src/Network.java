@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.IOUtils;
 
+
 import com.google.gson.Gson;
 
 
@@ -47,14 +48,38 @@ public class Network implements AutoCloseable{
     }
     
     
-    public void requestSegment(long startTime, long endTime, int resolution, SegmentListener list) throws IOException
+    public void requestSerials(SerialListener list) throws IOException
     {
+        Protocol.Request req = new Protocol.Request();
+        req.type = Protocol.Request.TypeOfRequest.RequestSerials;
+        
+        out.writeUTF(g.toJson(req));
+        
+        
+        String response = in.readUTF();
        
+        Protocol.Serials ser = g.fromJson(response, Protocol.Serials.class);
+        list.onSerial(ser.serialNumbers);
+        
+        
+        
+        
+    }
+    
+    public void requestSegment(long startTime, long endTime, int resolution, int serial, SegmentListener list) throws IOException
+    {
+        Protocol.Request req = new Protocol.Request();
+        req.type = Protocol.Request.TypeOfRequest.RequestData;
+        
+        out.writeUTF(g.toJson(req));
+        
+        
         Protocol.Message mes = new Protocol.Message();
         
         mes.startTime = startTime;
         mes.endTime =endTime;   
         mes.resolution = resolution;
+        mes.serialNumber = serial;
         
         out.writeUTF(g.toJson(mes));
 
@@ -77,9 +102,9 @@ public class Network implements AutoCloseable{
         
     }
     
-    public void requestDataPoints(long startTime,long endTime, int resolution, final DataPointListener list) throws IOException
+    public void requestDataPoints(long startTime,long endTime, int resolution,int serial, final DataPointListener list) throws IOException
     {
-        requestSegment(startTime, endTime,resolution, new SegmentListener() {
+        requestSegment(startTime, endTime,resolution,serial, new SegmentListener() {
             
             @Override
             public void onReceive(long startTime, long endTime, byte[] buffer) {
@@ -102,9 +127,9 @@ public class Network implements AutoCloseable{
     }
     
     
-    public void requestArrayDataPoints(long startTime, long endTime, int resolution, final ArrayDataPointListener list) throws IOException
+    public void requestArrayDataPoints(long startTime, long endTime, int resolution, int serial, final ArrayDataPointListener list) throws IOException
     {
-        requestSegment(startTime, endTime,resolution, new SegmentListener() {
+        requestSegment(startTime, endTime,resolution, serial,new SegmentListener() {
             
             @Override
             public void onReceive(long startTime, long endTime, byte[] buffer) {
@@ -136,13 +161,13 @@ public class Network implements AutoCloseable{
     
     
     private int counter;
-    public void requestBufferedDataPoints(long startTime, long endTime, int resolution, final int bufferAmount, final BufferedDataPointListener list) throws IOException
+    public void requestBufferedDataPoints(long startTime, long endTime, int resolution, int serial, final int bufferAmount, final BufferedDataPointListener list) throws IOException
     {
         counter = 0;
         final long[] times = new long[bufferAmount];
         final double[] values = new double[bufferAmount];
         
-        requestDataPoints(startTime, endTime,resolution, new DataPointListener() {
+        requestDataPoints(startTime, endTime,resolution, serial, new DataPointListener() {
             
             @Override
             public void onRecieve(long time, double value) {

@@ -29,7 +29,7 @@ public class CSNPlot {
     XYPlot p = new XYPlot(coll, domain, range, new SamplingXYLineRenderer());
 
     {
-        p.addRangeMarker(new ValueMarker(0, Color.RED, new BasicStroke(5)));
+        p.addRangeMarker(new ValueMarker(0, Color.BLACK, new BasicStroke(5)));
 
         range.setAutoRangeIncludesZero(true);
 

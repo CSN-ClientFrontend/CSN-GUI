@@ -10,6 +10,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javax.swing.SwingUtilities;
 
 
+
+
 interface StatusListener
 {
     void onStatusChange(String status);
@@ -18,6 +20,12 @@ interface StatusListener
 interface SourceListener
 {
     void onRecieve(long[] times, double[] values);
+}
+
+
+interface SerialListener
+{
+    void onSerial(int[] serials);
 }
 
 public class Source implements AutoCloseable, StatusListener {
@@ -30,12 +38,12 @@ public class Source implements AutoCloseable, StatusListener {
     String name;
     String url;
     int port;
-    
+    int serial;
     
     Thread myThread;
     SourceThread mySourceThread;
     
-    public Source(String name, String url, int port) {
+    public Source(String name, String url, int port, int serial) {
         mySourceThread = new SourceThread(url, port, requestList,this);
         myThread = new Thread(mySourceThread);
         myThread.start();
@@ -43,20 +51,48 @@ public class Source implements AutoCloseable, StatusListener {
         this.name = name;
         this.url = url;
         this.port = port;
+        this.serial = serial;
     }
     
     public void requestData(long startTime, long endTime, int resolution, SourceListener list)
     {
         if (!closed)
         {
-        Request res = new Request();
+        Request request = new Request();
+        request.type = Request.RequestType.DataRequest;
+        
+        DataRequest res = new DataRequest();
         res.startTime = startTime;
         res.endTime = endTime;
         res.resolution = resolution;
+        res.serial = serial;
         res.list = list;
         
-        requestList.add(res);
+        request.actualRequest = res;
+        
+        requestList.add(request);
         }
+    }
+    
+    public void requestSerialNumbers(SerialListener list)
+    {
+        if (!closed)
+        {
+            throw new RuntimeException("I fail. Track me down");
+            /*
+        Request request = new Request();
+        request.type = Request.RequestType.SerialRequest;
+        
+        SerialRequest res = new SerialRequest();
+        res.list = list;
+        
+        request.actualRequest = res;
+        
+        requestList.add(request);
+        */
+        }
+        
+        
     }
 
     boolean closed = false;
@@ -66,7 +102,7 @@ public class Source implements AutoCloseable, StatusListener {
         if (!closed)
         {
         Request res = new Request();
-        res.list = null;
+        res.type = Request.RequestType.CloseSocket;
         requestList.add(res);
         myThread.join();
         closed = true;
@@ -111,20 +147,46 @@ public class Source implements AutoCloseable, StatusListener {
     {
         return status;
     }
+
+    public int getSerial() {
+        // TODO Auto-generated method stub
+        return serial;
+    }
     
  
 }
 
 
 
+
 class Request
+{
+    enum RequestType
+    {
+        DataRequest, SerialRequest, CloseSocket
+    }
+    
+    RequestType type;
+    
+    Object actualRequest;
+}
+
+
+class DataRequest
 {
     long startTime;
     long endTime;
     int resolution;
+    int serial;
     SourceListener list;
+    
 }
 
+
+class SerialRequest
+{
+    SerialListener list;
+}
 
 
 class SourceThread implements Runnable
@@ -171,33 +233,48 @@ class SourceThread implements Runnable
             updateStatus("Waiting for request");
             
                 final Request next = requestList.take();
-                if (next.list == null)
+                
+                switch(next.type)
                 {
+                case CloseSocket:
                     updateStatus("Quit");
                     break; 
-                }
-                
-                if (next.endTime == -1)
-                    next.endTime = System.currentTimeMillis();
                     
-                updateStatus("Asking for data");
-                System.out.println("Asking for data");
-                network.requestArrayDataPoints(next.startTime, next.endTime, next.resolution, new ArrayDataPointListener() {
-                    
-                    @Override
-                    public void onRecieve(final long[] times, final double[] values) {
-                        updateStatus("Serving data to self");
-                       SwingUtilities.invokeLater(new Runnable() {
+                case DataRequest:
+                    final DataRequest dataReq = (DataRequest) next.actualRequest;
+                    if (dataReq.endTime == -1)
+                        dataReq.endTime = System.currentTimeMillis();
+                    updateStatus("Asking for data");
+                    System.out.println("Asking for data");
+                    network.requestArrayDataPoints(dataReq.startTime, dataReq.endTime, dataReq.resolution, dataReq.serial, new ArrayDataPointListener() {
                         
                         @Override
-                        public void run() {
-                            next.list.onRecieve(times, values);
+                        public void onRecieve(final long[] times, final double[] values) {
+                            updateStatus("Serving data to self");
+                           SwingUtilities.invokeLater(new Runnable() {
+                            
+                            @Override
+                            public void run() {
+                                dataReq.list.onRecieve(times, values);
+                                
+                            }
+                        });
                             
                         }
                     });
-                        
-                    }
-                });
+                    break;
+                  
+                case SerialRequest:
+                    final SerialRequest serReq = (SerialRequest) next.actualRequest;
+                    updateStatus("I fail in serial request. I really fail. Fail");
+                    throw new RuntimeException("I really fail. I just wasted 10 minutes");
+                    //break;
+                    
+                    
+                  
+                }
+        
+              
                 
                 
            
