@@ -46,13 +46,30 @@ public class HistoryViewer extends JInternalFrame {
     CSNPlot plot = new CSNPlot(sources);
     
     
-    JDateChooser fromDate = new JDateChooser(new Date());
-    JDateChooser toDate = new JDateChooser(new Date());
+    JDateChooser fromDate = new JDateChooser(new Date(DateTime.now(TimeZone.getTimeZone("GMT")).getMilliseconds(TimeZone.getDefault())));
+    JDateChooser toDate = new JDateChooser(new Date(DateTime.now(TimeZone.getTimeZone("GMT")).getMilliseconds(TimeZone.getDefault())));
     
     TimePanel fromTime = new TimePanel();
     TimePanel toTime = new TimePanel();
     
   
+    public void setTime(DateTime fromDateTime,DateTime toDateTime)
+    {
+      
+        
+        fromDate.setDate(new Date(fromDateTime.getMilliseconds(TimeZone.getDefault())));
+        toDate.setDate(new Date(toDateTime.getMilliseconds(TimeZone.getDefault())));
+       
+        
+        fromTime.set(fromDateTime);
+        toTime.set(toDateTime);
+        
+        goButton.doClick();
+        
+    }
+    
+    JButton goButton;
+    
     public HistoryViewer() {
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setBounds(100, 100, 513, 500);
@@ -73,8 +90,8 @@ public class HistoryViewer extends JInternalFrame {
         getContentPane().add(toDate,"growx, pushx");
         
        
-        JButton button = new JButton("Go");
-        button.addActionListener(new ActionListener() {
+        goButton = new JButton("Go");
+        goButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 Calendar fromCalendar = fromDate.getCalendar();
                 DateTime fromDateTime = new DateTime(fromCalendar.get(Calendar.YEAR),fromCalendar.get(Calendar.MONTH)+1,fromCalendar.get(Calendar.DAY_OF_MONTH),fromTime.getHour(),fromTime.getMinute(),fromTime.getSecond(),fromTime.getMilliSecond()*1000);
@@ -109,7 +126,7 @@ public class HistoryViewer extends JInternalFrame {
                 
             }
         });
-        getContentPane().add(button,"gap unrelated, wrap");
+        getContentPane().add(goButton,"gap unrelated, wrap");
         
         
         getContentPane().add(new JLabel("(GMT)Hours:Minutes:Seconds:Milliseconds"),"span 2");

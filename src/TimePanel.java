@@ -1,6 +1,9 @@
+import hirondelle.date4j.DateTime;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import javax.swing.JPanel;
 
@@ -27,20 +30,25 @@ public class TimePanel extends JPanel {
         millisecondField = new JSpinField(0, 999);
         
         
-        Date b = new Date();
+        DateTime d = DateTime.now(TimeZone.getTimeZone("GMT"));
+     
         
-       
-        
-        hourField.setValue(b.getHours());
-        minuteField.setValue(b.getMinutes());
-        secondField.setValue(b.getSeconds());
-        hourField.setValue(0);
+        set(d);
         
         
         add(hourField,"span 2, split 4,growx 20");
         add(minuteField,"growx 20");
         add(secondField,"growx 20");
         add(millisecondField,"growx 40");
+    }
+    
+    
+    public void set(DateTime t)
+    {
+        hourField.setValue(t.getHour());
+        minuteField.setValue(t.getMinute());
+        secondField.setValue(t.getSecond());
+        millisecondField.setValue(t.getNanoseconds()/1000);
     }
     
     public int getHour()
