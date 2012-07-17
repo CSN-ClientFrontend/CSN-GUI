@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 
+import org.jfree.data.general.Series;
 import org.jfree.data.xy.XYSeries;
 
 
@@ -93,6 +94,12 @@ public class HistoryViewer extends JInternalFrame {
         goButton = new JButton("Go");
         goButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
+                
+                for (Object s : plot.coll.getSeries())
+                {
+                    ((XYSeries) s).clear();
+                }
+                
                 Calendar fromCalendar = fromDate.getCalendar();
                 DateTime fromDateTime = new DateTime(fromCalendar.get(Calendar.YEAR),fromCalendar.get(Calendar.MONTH)+1,fromCalendar.get(Calendar.DAY_OF_MONTH),fromTime.getHour(),fromTime.getMinute(),fromTime.getSecond(),fromTime.getMilliSecond()*1000);
                 
@@ -111,7 +118,7 @@ public class HistoryViewer extends JInternalFrame {
                        
                        
                        XYSeries series = plot.getSeries(source);                
-                       series.clear();
+                     
                       
                        for (int i = 0; i < times.length; i+= 10)
                        {

@@ -6,6 +6,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
@@ -23,6 +24,7 @@ import javax.swing.table.TableModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -162,8 +164,27 @@ public class SourcesDialog extends JFrame {
                         } catch (UnknownHostException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
+                        }
+                        catch( ConnectException e)
+                        {
+                            System.out.println("error, timed out");
+                            e.printStackTrace();
+                          
+                            SwingUtilities.invokeLater(new Runnable() {
+                                
+                                @Override
+                                public void run() {
+                                    JOptionPane.showMessageDialog(SourcesDialog.this, "Your request for serials timed out. Please make sure the port and IP are correct","Timeout Error",JOptionPane.ERROR_MESSAGE);
+                                    
+                                    
+                                }
+                            });
+                           
+                          
+                        }
+                        
+                        catch (IOException e) {
+                            System.out.println("IOException");
                             e.printStackTrace();
                         }
                         
