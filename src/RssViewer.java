@@ -89,6 +89,7 @@ public class RssViewer extends JInternalFrame {
         getContentPane().add(button,"align right, wrap");
      
         final JTable tableWidget =new JTable(table.getTableModel());
+        tableWidget.setAutoCreateRowSorter(true);
         
         getContentPane().add(new JScrollPane(tableWidget),"span 2,wrap");
         

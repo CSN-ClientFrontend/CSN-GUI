@@ -29,7 +29,7 @@ public class SourceManager implements StatusListener {
     
     private List<SourceManagerChangesListener> changes = new ArrayList<>();
    List<Source> sources = new ArrayList<>();
-    private List<AbstractTableModel> listeners = new ArrayList<>();
+  
     
     public void requestData(long[] startTimes, long[] endTimes, int resolution, final SourceManagerListener list)
     {
@@ -110,75 +110,78 @@ public class SourceManager implements StatusListener {
        
     }
    
+    AbstractTableModel model =  new AbstractTableModel() {
+        
+        String columnNames[] = {"Name","Location","Serial","Status"};
+   
+        
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+           
+            // TODO Auto-generated method stub
+            Source s = sources.get(rowIndex);
+          
+            switch(columnIndex)
+            {
+            case 0:
+                return s.getName();
+                
+            
+            case 1:
+                return String.format("%s:%s", s.getUrl(),s.getPort());
+                
+            case 2:
+                return s.getSerial();
+               
+            case 3:
+                return s.getStatus();
+            }
+            
+            return "This should never happen";
+        }
+        
+        @Override
+        public int getRowCount() {
+            // TODO Auto-generated method stub
+           
+            return sources.size();
+        }
+        
+        @Override
+        public int getColumnCount() {
+            // TODO Auto-generated method stub
+            return columnNames.length;
+        }
+        
+        @Override
+        public String getColumnName(int column) {
+            // TODO Auto-generated method stub
+            return columnNames[column];
+        }
+    };
+    
     private void alertTables()
     {
-        for (AbstractTableModel listener : listeners)
-            listener.fireTableDataChanged();
+        
+       
+       model.fireTableDataChanged();
     }
     
     
     public TableModel getModelOf()
     {
         
-        AbstractTableModel model =  new AbstractTableModel() {
-            
-            String columnNames[] = {"Name","Location","Serial","Status"};
-       
-            
-            @Override
-            public Object getValueAt(int rowIndex, int columnIndex) {
-               
-                // TODO Auto-generated method stub
-                Source s = sources.get(rowIndex);
-              
-                switch(columnIndex)
-                {
-                case 0:
-                    return s.getName();
-                    
-                
-                case 1:
-                    return String.format("%s:%s", s.getUrl(),s.getPort());
-                    
-                case 2:
-                    return s.getSerial();
-                   
-                case 3:
-                    return s.getStatus();
-                }
-                
-                return "This should never happen";
-            }
-            
-            @Override
-            public int getRowCount() {
-                // TODO Auto-generated method stub
-               
-                return sources.size();
-            }
-            
-            @Override
-            public int getColumnCount() {
-                // TODO Auto-generated method stub
-                return columnNames.length;
-            }
-            
-            @Override
-            public String getColumnName(int column) {
-                // TODO Auto-generated method stub
-                return columnNames[column];
-            }
-        };
+      
         
       
-        listeners.add(model);
         return model;
     }
 
     @Override
     public void onStatusChange(String status) {
-        alertTables();
-        
+        //alertTables();
+        System.out.println(model.getRowCount());
+        model.fireTableRowsUpdated(0, model.getRowCount()-1);
     }
   
    

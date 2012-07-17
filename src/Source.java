@@ -104,7 +104,9 @@ public class Source implements AutoCloseable, StatusListener {
         Request res = new Request();
         res.type = Request.RequestType.CloseSocket;
         requestList.add(res);
+        System.out.println("Joining thread");
         myThread.join();
+        System.out.println("Now closed");
         closed = true;
         }
         
@@ -238,7 +240,8 @@ class SourceThread implements Runnable
                 {
                 case CloseSocket:
                     updateStatus("Quit");
-                    break; 
+                    return;
+                    
                     
                 case DataRequest:
                     final DataRequest dataReq = (DataRequest) next.actualRequest;

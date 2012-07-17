@@ -8,6 +8,7 @@ import java.util.TimeZone;
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 
 import com.toedter.calendar.JDateChooser;
@@ -95,10 +96,9 @@ public class HistoryViewer extends JInternalFrame {
         goButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 
-                for (Object s : plot.coll.getSeries())
-                {
-                    ((XYSeries) s).clear();
-                }
+                
+                
+                
                 
                 Calendar fromCalendar = fromDate.getCalendar();
                 DateTime fromDateTime = new DateTime(fromCalendar.get(Calendar.YEAR),fromCalendar.get(Calendar.MONTH)+1,fromCalendar.get(Calendar.DAY_OF_MONTH),fromTime.getHour(),fromTime.getMinute(),fromTime.getSecond(),fromTime.getMilliSecond()*1000);
@@ -107,9 +107,23 @@ public class HistoryViewer extends JInternalFrame {
                 Calendar toCalendar = toDate.getCalendar();
                 DateTime toDateTime = new DateTime(toCalendar.get(Calendar.YEAR),toCalendar.get(Calendar.MONTH)+1,toCalendar.get(Calendar.DAY_OF_MONTH),toTime.getHour(),toTime.getMinute(),toTime.getSecond(),toTime.getMilliSecond()*1000);
              
+                
+
+                if (fromDateTime.gteq(toDateTime))
+                {
+                    JOptionPane.showMessageDialog(HistoryViewer.this, "This is an invalid interval of time", "Invalid interval error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
                 long fromMilliseconds = fromDateTime.getMilliseconds(TimeZone.getTimeZone("GMT"));
                 long toMilliseconds = toDateTime.getMilliseconds(TimeZone.getTimeZone("GMT"));
                
+                
+                for (Object s : plot.coll.getSeries())
+                {
+                    ((XYSeries) s).clear();
+                }
+                
                 
                 sources.requestData(fromMilliseconds, toMilliseconds, options.getResolution(), new SourceManagerListener() {
                     
