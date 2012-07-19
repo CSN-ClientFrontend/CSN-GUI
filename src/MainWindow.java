@@ -126,7 +126,7 @@ public class MainWindow{
 		final JDesktopPane desktopPane = new JDesktopPane();
 		desktopPane.setBackground(SystemColor.menu);
 		frmCommunitySeismicNetwork.getContentPane().add(desktopPane);
-		
+	
 		
 	
 		historyViewer = new HistoryViewer();

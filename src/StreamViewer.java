@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -154,6 +155,7 @@ public class StreamViewer extends JInternalFrame {
                    
                    for (int i = 0; i  < times.length; i++)
                    {
+                       
                        series.add(times[i], values[i]);
                    }
                    

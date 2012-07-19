@@ -58,7 +58,7 @@ public class Network implements AutoCloseable{
         
         String response = in.readUTF();
        
-        Protocol.Serials ser = g.fromJson(response, Protocol.Serials.class);
+        Protocol.RequestSerials.SerialsResponse ser = g.fromJson(response, Protocol.RequestSerials.SerialsResponse.class);
         list.onSerial(ser.serialNumbers);
         
         
@@ -74,7 +74,7 @@ public class Network implements AutoCloseable{
         out.writeUTF(g.toJson(req));
         
         
-        Protocol.Message mes = new Protocol.Message();
+        Protocol.RequestData.RequestMessageParameters mes = new Protocol.RequestData.RequestMessageParameters();
         
         mes.startTime = startTime;
         mes.endTime =endTime;   
@@ -87,10 +87,10 @@ public class Network implements AutoCloseable{
         String s = in.readUTF();
         System.out.println(s + "; was " + s.length());
 
-        Protocol.Response res = g.fromJson(s, Protocol.Response.class);
+        Protocol.RequestData.ResponseMetadata res = g.fromJson(s,  Protocol.RequestData.ResponseMetadata.class);
            System.out.println("I was ok with this?");
         
-        for (Protocol.Section sect : res.sections) {
+        for (Protocol.RequestData.SectionMetada sect : res.sections) {
             System.out.println(sect.length);
 
           
