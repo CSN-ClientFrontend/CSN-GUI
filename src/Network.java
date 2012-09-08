@@ -47,6 +47,52 @@ public class Network implements AutoCloseable{
        in = new DataInputStream(mySock.getInputStream());
     }
     
+    Protocol.PushQueue.PushQueueItem[] requestPushQueueDisplay() throws IOException
+    {
+        Protocol.Request req = new Protocol.Request();
+        req.type = Protocol.Request.TypeOfRequest.PushQueueDisplayRequest;
+        
+        out.writeUTF(g.toJson(req));
+        
+        
+        System.out.println("Give me my data!!");
+        String response = in.readUTF();
+        
+        Protocol.PushQueue.PushQueueDisplayResponse res = g.fromJson(response, Protocol.PushQueue.PushQueueDisplayResponse.class);
+        System.out.println("Items recieved: " + res.items);
+        return res.items;
+    }
+    
+    long requestPushQueueAdd(Protocol.PushQueue.PushQueueAddRequest needed) throws IOException
+    {
+        Protocol.Request req = new Protocol.Request();
+        
+        req.type = Protocol.Request.TypeOfRequest.PushQueueAddRequest;
+        out.writeUTF(g.toJson(req));
+        out.writeUTF(g.toJson(needed));
+        
+        String response = in.readUTF();
+        
+        Protocol.PushQueue.PushQueueAddResponse res = g.fromJson(response, Protocol.PushQueue.PushQueueAddResponse.class);
+        
+        return res.id;
+    }
+    
+    boolean requestPushQueueRemove(Protocol.PushQueue.PushQueueRemoveRequest needed) throws IOException
+    {
+        Protocol.Request req = new Protocol.Request();
+        
+        req.type = Protocol.Request.TypeOfRequest.PushQueueRemoveRequest;
+        out.writeUTF(g.toJson(req));
+        out.writeUTF(g.toJson(needed));
+        
+        String response = in.readUTF();
+        
+        Protocol.PushQueue.PushQueueRemoveResponse res = g.fromJson(response, Protocol.PushQueue.PushQueueRemoveResponse.class);
+        
+        return res.success;
+    }
+    
     
     public void requestSerials(SerialListener list) throws IOException
     {

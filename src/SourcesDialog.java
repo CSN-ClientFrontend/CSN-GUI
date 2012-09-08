@@ -12,6 +12,7 @@ import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
@@ -77,6 +78,7 @@ public class SourcesDialog extends JFrame {
    
         
         table = new JTable(m.getModelOf());
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
         getContentPane().add(new JScrollPane(table),"span 2, wrap");
         

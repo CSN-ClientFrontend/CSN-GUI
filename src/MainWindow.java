@@ -130,6 +130,7 @@ public class MainWindow{
 		
 	
 		historyViewer = new HistoryViewer();
+		historyViewer.setLocation(159, 59);
 		desktopPane.add(historyViewer);
 		
 		rssViewer = new RssViewer(new HistoryViewerProvider() {
@@ -206,6 +207,18 @@ public class MainWindow{
             }
         });
         mnView.add(chckbxmntmRSSViewer);
+        
+        JMenu mnOptions = new JMenu("Options");
+        menuBar.add(mnOptions);
+        
+        JMenuItem mntmPushQueue = new JMenuItem("Push Queue");
+        mntmPushQueue.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                PushQueueFrame frame = new PushQueueFrame();
+                frame.setVisible(true);
+            }
+        });
+        mnOptions.add(mntmPushQueue);
         
         rssViewer.addInternalFrameListener(new OnlyCloseListener() {
             
